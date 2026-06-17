@@ -1,7 +1,12 @@
 [project]
 name = "nlp-rag-proj"
 version = "0.1.0"
-description = "Add your description here"
+description = "Projekt NLP - dane z artykulow BBC"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "kaggle>=2.2.1",
+    "numpy>=2.4.6",
+    "pandas>=3.0.3",
+    "pytest>=9.1.0",
+]
