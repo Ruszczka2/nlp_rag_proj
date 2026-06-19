@@ -17,6 +17,12 @@ def build_vectorizer() -> TfidfVectorizer:
 
 def prepare_dataset(df: pd.DataFrame):
 
-    X_train, X_test, y_train, y_test  = train_test_split(df["Text"], df["Category"], train_size=0.8, random_state=42, stratify=df["Category"])
+    X_train, X_test, y_train, y_test  = train_test_split(
+        df["Text"],
+        df["Category"], 
+        train_size=0.8, 
+        random_state=42, 
+        stratify=df["Category"]
+        )
 
     return X_train, X_test, y_train, y_test

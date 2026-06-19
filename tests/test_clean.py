@@ -1,5 +1,8 @@
 from nlp_rag_proj.clean import normalize_text
 
+def test_normalize_text_no_string():
+    assert normalize_text([]) == ""
+
 def test_normalize_text_empty_string():
     assert normalize_text("") == ""
 
@@ -20,3 +23,9 @@ def test_normalize_text_whitespaces():
 
 def test_normalize_text_numbers():
     assert normalize_text("ab15 c8888") == "ab c"
+
+def test_normalize_text_complex():
+    assert normalize_text("Check this 123! https://www.google.com He said it is a new project.") == "check this he said it is a new project"
+
+def test_normalize_text_already_normalized():
+    assert normalize_text("check this he said it is a new project") == "check this he said it is a new project"

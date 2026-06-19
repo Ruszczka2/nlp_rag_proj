@@ -2,6 +2,10 @@ import re
 import string
 
 def normalize_text(text: str) -> str:
+    # Sprawdzenie czy to string
+    if not isinstance(text, str):
+        return ""
+
     # Sprowadzenie do małych liter
     text = text.lower()
 
@@ -19,3 +23,6 @@ def normalize_text(text: str) -> str:
     text = " ".join(text.split())
 
     return text
+
+if __name__ == "__main__":
+    pass
