@@ -1,7 +1,7 @@
 from pathlib import Path
 import pandas as pd
 
-BASE_DIR = Path.cwd() / "data" / "raw"
+DATA_DIR = Path.cwd() / "data" / "raw"
 
 def load_bbc_csv(*, set_type: str = None) -> pd.DataFrame:
 
@@ -9,9 +9,9 @@ def load_bbc_csv(*, set_type: str = None) -> pd.DataFrame:
         raise TypeError(f"set_type must be {type("")}, but it is: {type(set_type)}")
 
     if set_type == "train":
-        load_path = BASE_DIR / "BBC_train.csv"
+        load_path = Path(DATA_DIR / "BBC_train.csv")
     elif set_type == "test":
-        load_path = BASE_DIR / "BBC_test.csv"
+        load_path = Path(DATA_DIR / "BBC_test.csv")
     else:
         raise ValueError(f"set_type can be either 'train or 'test', but it is: {set_type}")
     
