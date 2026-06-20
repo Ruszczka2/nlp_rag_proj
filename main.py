@@ -4,14 +4,13 @@ import pandas as pd
 import argparse
 
 
-def main():
+def main(model_path: Path = Path.cwd() / "models" / "tfidf_svc.joblib"):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--submit", action="store_true", help="Wygeneruj plik submission_kaggle.csv")
     args = parser.parse_args()
 
     df = nlp.io.load_bbc_csv(set_type="train")
-    model_path = Path.cwd() / "models" / "tfidf_svc.joblib"
 
     X_train, X_test, y_train, y_test = nlp.features.prepare_dataset(df, True)
 
