@@ -8,14 +8,14 @@ import pytest
 def dummy_dataframe():
     # Definiujemy bazowe dane (10 wierszy), w których każda klasa ma min. 2 wpisy
     base_data = {
-        "Text": [
+        "text": [
             "Article one text", "Article two text", 
             "Article three text", "Article four text", 
             "Article five text", "Article six text",
             "Article seven text", "Article eight text",
             "Article nine text", "Article ten text"
         ],
-        "Category": [
+        "category": [
             "tech", "tech", 
             "business", "business", 
             "sport", "sport",
@@ -44,7 +44,7 @@ def test_prepare_dataset_correct_datatypes(dummy_dataframe):
 
 def test_prepare_dataset_retains_unique_classes_in_splits(dummy_dataframe):
     _, _, y_train, y_test = prepare_dataset(dummy_dataframe)
-    correct_category_length = len(pd.unique(dummy_dataframe["Category"]))
+    correct_category_length = len(pd.unique(dummy_dataframe["category"]))
 
     assert len(pd.unique(y_train)) == correct_category_length
     assert len(pd.unique(y_test)) == correct_category_length
