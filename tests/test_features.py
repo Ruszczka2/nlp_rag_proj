@@ -1,5 +1,6 @@
 from nlp_rag_proj.features import build_vectorizer, prepare_dataset
-from sklearn.feature_extraction.text import TfidfVectorizer
+from nlp_rag_proj.clean import normalize_text
+from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 import pandas as pd
 import pytest
 
@@ -18,19 +19,16 @@ def dummy_dataframe():
             "tech", "tech", 
             "business", "business", 
             "sport", "sport",
-            "tech", "business",
-            "tech", "sport"
+            "politics", "politics",
+            "entertainment", "entertainment"
         ]
     }
     df_base = pd.DataFrame(base_data)
     
-    # Podwajamy zbiór danych (do 20 wierszy), aby test_size przy 20% wynosił 4 elementy
-    df_large = pd.concat([df_base, df_base], ignore_index=True)
+    df_large = pd.concat([df_base, df_base, df_base, df_base, df_base], ignore_index=True)
     return df_large
 
-def test_build_vectorizer_correct_datatype():
-    vectorizer = build_vectorizer()
-    assert isinstance(vectorizer, TfidfVectorizer)
+
 
 def test_prepare_dataset_correct_length(dummy_dataframe):
     assert len(prepare_dataset(dummy_dataframe)) == 4
@@ -38,10 +36,28 @@ def test_prepare_dataset_correct_length(dummy_dataframe):
 def test_prepare_dataset_correct_datatypes(dummy_dataframe):
     result = prepare_dataset(dummy_dataframe)
     
-    # Sprawdzamy, czy funkcja zwróciła dokładnie 4 elementy
     assert isinstance(result, tuple)
     assert len(result) == 4
     
-    # Sprawdzamy, czy każdy element jest Serią danych Pandas
     for item in result:
         assert isinstance(item, pd.Series)
+
+def test_prepare_dataset_retains_unique_classes_in_splits(dummy_dataframe):
+    _, _, y_train, y_test = prepare_dataset(dummy_dataframe)
+    correct_category_length = len(pd.unique(dummy_dataframe["Category"]))
+    
+    assert len(pd.unique(y_train)) == correct_category_length
+    assert len(pd.unique(y_test)) == correct_category_length
+
+
+
+def test_build_vectorizer_correct_datatype():
+    vectorizer = build_vectorizer()
+    assert isinstance(vectorizer, TfidfVectorizer)
+
+def test_build_vectorizer_params():
+    vectorizer = build_vectorizer()
+    assert \
+    vectorizer.get_params()["preprocessor"] == normalize_text \
+    and \
+    vectorizer.get_params()["stop_words"] == list(ENGLISH_STOP_WORDS.union({"s", "-", "said", "new"}))

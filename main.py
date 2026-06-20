@@ -11,9 +11,16 @@ def main():
     df = nlp.io.load_bbc_csv(set_type="train")
     print(df.head())
 
-    X_train, X_test, y_train, y_test = nlp.features.prepare_dataset(df)
+    X_train, X_test, y_train, y_test = nlp.features.prepare_dataset(df, True)
     for pds in [X_train, X_test, y_train, y_test]:
         print(pds.head())
+
+    model = nlp.train.train(X_train, y_train)
+
+    model_path = Path.cwd() / "models" / "tfidf_svc.joblib"
+    
+    if not model_path.exists():
+        raise FileNotFoundError("model not found")
 
     model = joblib.load(Path.cwd() / "models" / "tfidf_svc.joblib")
 

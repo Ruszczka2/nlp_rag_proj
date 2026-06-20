@@ -2,6 +2,7 @@ import re
 import string
 
 def normalize_text(text: str) -> str:
+
     # Sprawdzenie czy to string
     if not isinstance(text, str):
         return ""
@@ -14,7 +15,7 @@ def normalize_text(text: str) -> str:
     text = re.sub(r'www\.\S+', '', text)
 
     # Usuwanie znaków interpunkcyjnych
-    text = re.sub(rf'[{re.escape(string.punctuation)}]', '', text)
+    text = re.sub(rf'[{re.escape(string.punctuation.replace('$',''))}]', '', text)
 
     # Usuwanie cyfr
     text = re.sub(r'[1234567890]', '', text)
@@ -25,4 +26,4 @@ def normalize_text(text: str) -> str:
     return text
 
 if __name__ == "__main__":
-    pass
+    print(string.punctuation.replace('$',''))
