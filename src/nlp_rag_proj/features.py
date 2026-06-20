@@ -20,19 +20,21 @@ def prepare_dataset(df: pd.DataFrame, split_test = True) -> tuple[pd.Series, pd.
 
     if split_test:
         X_train, X_test, y_train, y_test  = train_test_split(
-            df["Text"],
-            df["Category"],
+            df["text"],
+            df["category"],
             train_size=0.8,
             random_state=42,
-            stratify=df["Category"]
+            stratify=df["category"]
             )
     else:
-        X_train = df["Text"]
-        y_train = df["Category"]
+        X_train = df["text"]
+        y_train = df["category"]
         X_test = pd.Series(dtype=str)
         y_test = pd.Series(dtype=str)
 
     return X_train, X_test, y_train, y_test
+
+
 
 if __name__ == "__main__":
     

@@ -7,13 +7,15 @@ from pathlib import Path
 import pandas as pd
 import joblib
 
-def train(X: pd.Series, y: pd.Series, model_path: Path = Path.cwd() / "models") -> Pipeline:
+def train(X: pd.Series, y: pd.Series, model_path: Path = Path.cwd() / "models" / "tfidf_svc.joblib") -> Pipeline:
 
     if not isinstance(X, (pd.Series, pd.DataFrame)) or not isinstance(y, (pd.Series, pd.DataFrame)):
         raise TypeError("Both args 'X' and 'y' must be type: pd.Series or pd.DataFrame")
     
     if X.shape[0] != y.shape[0]:
         raise ValueError(f"X and y are diffrent sizes: X({X.shape[0]}) -> y({y.shape[0]})")
+    
+    model_path.parent.mkdir(parents=True, exist_ok=True)
 
     pipe = Pipeline([
         ('tfidf', build_vectorizer()),
@@ -43,7 +45,7 @@ def train(X: pd.Series, y: pd.Series, model_path: Path = Path.cwd() / "models") 
     print("Najlepsze parametry:", random_search.best_params_)
     print("Najlepszy wynik (F1-score):", random_search.best_score_)
 
-    joblib.dump(random_search.best_estimator_, Path(model_path / "tfidf_svc.joblib"))
+    joblib.dump(random_search.best_estimator_, model_path)
 
     return random_search.best_estimator_ 
 

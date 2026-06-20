@@ -45,7 +45,7 @@ def test_prepare_dataset_correct_datatypes(dummy_dataframe):
 def test_prepare_dataset_retains_unique_classes_in_splits(dummy_dataframe):
     _, _, y_train, y_test = prepare_dataset(dummy_dataframe)
     correct_category_length = len(pd.unique(dummy_dataframe["Category"]))
-    
+
     assert len(pd.unique(y_train)) == correct_category_length
     assert len(pd.unique(y_test)) == correct_category_length
 
@@ -57,7 +57,5 @@ def test_build_vectorizer_correct_datatype():
 
 def test_build_vectorizer_params():
     vectorizer = build_vectorizer()
-    assert \
-    vectorizer.get_params()["preprocessor"] == normalize_text \
-    and \
-    vectorizer.get_params()["stop_words"] == list(ENGLISH_STOP_WORDS.union({"s", "-", "said", "new"}))
+    assert vectorizer.get_params()["preprocessor"] == normalize_text
+    assert vectorizer.get_params()["stop_words"] == list(ENGLISH_STOP_WORDS.union({"s", "-", "said", "new"}))

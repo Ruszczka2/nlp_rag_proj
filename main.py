@@ -1,41 +1,31 @@
 import nlp_rag_proj as nlp
-from sklearn.metrics import classification_report, confusion_matrix
-import joblib
 from pathlib import Path
 import pandas as pd
 
 
 def main():
-    # tablica = np.array([[0,1,2],[5,8,7]], dtype=np.int8)
-    # print(tablica.shape)
+
     df = nlp.io.load_bbc_csv(set_type="train")
-    print(df.head())
+    model_path = Path.cwd() / "models" / "tfidf_svc.joblib"
 
     X_train, X_test, y_train, y_test = nlp.features.prepare_dataset(df, True)
-    for pds in [X_train, X_test, y_train, y_test]:
-        print(pds.head())
 
-    model = nlp.train.train(X_train, y_train)
+    if model_path.exists():
+        model = nlp.predict.load_model()
+    else:
+        print(f"Nie znaleziono modelu w: {model_path}\n\nTrenuje model...\n")
+        model = nlp.train.train(X_train, y_train, model_path)
 
-    model_path = Path.cwd() / "models" / "tfidf_svc.joblib"
-    
-    if not model_path.exists():
-        raise FileNotFoundError("model not found")
+    y_pred = nlp.predict.predict_category(X_test, model)
 
-    model = joblib.load(Path.cwd() / "models" / "tfidf_svc.joblib")
+    nlp.predict.evaluate_predictions(y_pred, y_test)
 
-    y_pred = model.predict(X_test)
 
-    print("Raport Klasyfikacji:")
-    print(classification_report(y_test, y_pred))
-
-    print("Macierz pomyłek:")
-    print(confusion_matrix(y_test, y_pred))
-
+    # --- Utworzenie submission na platforme Kaggle i sprawdzenie wyników ---
     df_test = nlp.io.load_bbc_csv(set_type="test")
 
-    article_ids = df_test["ArticleId"]
-    X_test_test = df_test["Text"]
+    article_ids = df_test["articleid"]
+    X_test_test = df_test["text"]
 
     y_test_pred = model.predict(X_test_test)
 
