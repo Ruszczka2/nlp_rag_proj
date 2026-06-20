@@ -8,6 +8,7 @@
 - [x] Krótki opis datasetu
 - [x] Opisać najważniejsze obserwacje
 - [x] Wynik na Kaggle
+- [x] Dodać Stemming i Lematyzacje
 - [ ] RAG
 - [ ] Dodać sekcję instalacji
 
@@ -39,8 +40,7 @@ Struktura projektu przedstawia się następująco:
 ├── .gitignore
 │
 ├── data/
-│   ├── raw/         # oryginalne pliki CSV
-│   └── outputs/     # utworzone pliki CSV
+│   └── raw/         # oryginalne pliki CSV
 │
 ├── src/
 │   └── text_lab/
@@ -59,6 +59,7 @@ Struktura projektu przedstawia się następująco:
 │   ├── test_clean.py
 │   └── test_features.py
 │
+│── outputs/         # utworzone pliki CSV
 ├── models/          # zapisany pipeline (.joblib)
 └── main.py
 ```
