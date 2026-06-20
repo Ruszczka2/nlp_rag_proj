@@ -38,14 +38,9 @@ def apply_nlp(series: pd.Series, args: Any | None, *, stemmer, nlp_obj) -> pd.Se
         texts_to_process = processed.tolist()
 
         if args.stem:
-            print("Running stem...")
-            processed_list = [" ".join(stemmer.stemWords(text.split())) for text in texts_to_process]
-            return pd.Series(processed_list, index=series.index)
+             stem(series, texts_to_process, stemmer)
         elif args.lem:
-            print("Running lemmatizator...")
-            docs = nlp_obj.pipe(texts_to_process, batch_size=256)
-            processed_list = [" ".join([token.lemma_ for token in doc]) for doc in docs]
-            return pd.Series(processed_list, index=series.index)
+            lemmatize(series, texts_to_process, nlp_obj)
         
         return processed
 
