@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import joblib
 
-def train(X: pd.Series, y: pd.Series, model_path: Path = Path.cwd() / "models" / "tfidf_svc.joblib") -> Pipeline:
+def train(X: pd.Series, y: pd.Series, model_path: Path) -> Pipeline:
 
     if not isinstance(X, (pd.Series, pd.DataFrame)) or not isinstance(y, (pd.Series, pd.DataFrame)):
         raise TypeError("Both args 'X' and 'y' must be type: pd.Series or pd.DataFrame")
@@ -42,8 +42,8 @@ def train(X: pd.Series, y: pd.Series, model_path: Path = Path.cwd() / "models" /
 
     random_search.fit(X, y)
 
-    print("Najlepsze parametry:", random_search.best_params_)
-    print("Najlepszy wynik (F1-score):", random_search.best_score_)
+    print("Best Params:", random_search.best_params_)
+    print("Best Score (F1-score):", random_search.best_score_)
 
     joblib.dump(random_search.best_estimator_, model_path)
 

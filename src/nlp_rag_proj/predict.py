@@ -1,6 +1,5 @@
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report, confusion_matrix
-from typing import Literal
 
 from pathlib import Path
 import pandas as pd
@@ -10,14 +9,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-
 def load_model(load_path: Path = Path(Path.cwd() / "models" / "tfidf_svc.joblib")):
 
     if not load_path.is_file():
         raise FileNotFoundError(f"Model nie istnieje pod ścieżką: {load_path}")
     
     return joblib.load(load_path)
-
 
 def predict_category(
         X_test: pd.Series,

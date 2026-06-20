@@ -6,12 +6,12 @@ from nlp_rag_proj.io import load_bbc_csv
 
 ENGLISH_STOP_WORDS: frozenset
 
-def build_vectorizer(text_normalization = normalize_text) -> TfidfVectorizer:
+def build_vectorizer() -> TfidfVectorizer:
 
     # Dodaje własne, sprawdzone w analize stop-słowa
     vectorizer = TfidfVectorizer(
         stop_words = list(ENGLISH_STOP_WORDS.union({"s", "-", "said", "new"})),
-        preprocessor=text_normalization
+        #preprocessor=text_normalization
         )
     
     return vectorizer

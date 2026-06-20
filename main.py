@@ -14,25 +14,36 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
 
     df = nlp.io.load_bbc_csv(set_type="train")
 
-    X_train, X_test, y_train, y_test = nlp.features.prepare_dataset(df, True)
+    X_train, X_test, y_train, y_test = nlp.features.prepare_dataset(df, split_test=True)
+
+    stemmer = None
+    nlp_obj = None
+    path_suf = None
 
     if args.stem:
-        print("\nLoading stem model...\n")
+        print("\nLoading stem model...")
         stemmer = Stemmer.Stemmer('english')
-        text_normalization = partial(nlp.tokenization.stem, nlp_object=stemmer)
-    if args.lem:
-        print("\nLoading lemmatization model...\n")
-        nlp_obj = spacy.load("en_core_news_trf")
-        text_normalization = partial(nlp.tokenization.lemmatize, nlp_object=nlp_obj)
-        return 0
+        path_suf = "stem_tfidf_svc"
+
+    elif args.lem:
+        nlp.tokenization.init_gpu()
+        print("\nLoading lemmatization model...")
+        nlp_obj = spacy.load("en_core_web_trf")
+        path_suf = "lem_tfidf_svc"
+
     else:
-        text_normalization = nlp.clean.normalize_text
+        path_suf = "tfidf_svc"
+
+    model_path = Path.cwd() / "models" / f"{path_suf}.joblib"
+
+    X_test = nlp.clean.apply_nlp(X_test, args, stemmer=stemmer, nlp_obj=nlp_obj)
 
     if model_path.exists():
         model = nlp.predict.load_model()
     else:
-        print(f"Nie znaleziono modelu w: {model_path}\n\nTrenuje model...\n")
-        model = nlp.train.train(X=X_train, y=y_train, model_path=model_path, text_normalization=text_normalization)
+        X_train = nlp.clean.apply_nlp(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
+        print(f"Model has not beed found: {model_path}\nTraining model...\n")
+        model = nlp.train.train(X=X_train, y=y_train, model_path=model_path)
 
     y_pred = nlp.predict.predict_category(X_test=X_test, model=model)
 
@@ -44,7 +55,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
         df_test = nlp.io.load_bbc_csv(set_type="test")
 
         article_ids = df_test["articleid"]
-        X_test_test = df_test["text"]
+        X_test_test = nlp.clean.apply_nlp(df_test["text"], args, stemmer=stemmer, nlp_obj=nlp_obj)
 
         y_test_pred = model.predict(X_test_test)
 
@@ -53,7 +64,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
             'Category': y_test_pred
         })
 
-        submission_df.to_csv(Path.cwd() / "outputs" / "submission_kaggle.csv", index=False)
+        submission_df.to_csv(Path.cwd() / "outputs" / f"{path_suf}.csv", index=False)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

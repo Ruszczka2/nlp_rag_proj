@@ -1,5 +1,4 @@
 from nlp_rag_proj.features import build_vectorizer, prepare_dataset
-from nlp_rag_proj.clean import normalize_text
 from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 import pandas as pd
 import pytest
@@ -57,5 +56,4 @@ def test_build_vectorizer_correct_datatype():
 
 def test_build_vectorizer_params():
     vectorizer = build_vectorizer()
-    assert vectorizer.get_params()["preprocessor"] == normalize_text
     assert vectorizer.get_params()["stop_words"] == list(ENGLISH_STOP_WORDS.union({"s", "-", "said", "new"}))
