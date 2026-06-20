@@ -19,13 +19,12 @@ def init_gpu() -> bool:
 def tokenize(text: str) -> list[str]:
     pass
 
-def stem(series: pd.Series, texts_to_process: list[str], stemmer) -> str:
+def stem(series: pd.Series, texts_to_process: list[str], stemmer) -> pd.Series:
     print("Running stem...")
     processed_list = [" ".join(stemmer.stemWords(text.split())) for text in texts_to_process]
     return pd.Series(processed_list, index=series.index)
 
-
-def lemmatize(series: pd.Series, texts_to_process: list[str], nlp_obj: spacy.Language) -> str:
+def lemmatize(series: pd.Series, texts_to_process: list[str], nlp_obj: spacy.Language) -> pd.Series:
     print("Running lemmatizator...")
     docs = nlp_obj.pipe(texts_to_process, batch_size=256)
     processed_list = [" ".join([token.lemma_ for token in doc]) for doc in docs]
