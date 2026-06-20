@@ -40,7 +40,7 @@ def main():
             'Category': y_test_pred
         })
 
-        submission_df.to_csv('submission_kaggle.csv', index=False)
+        submission_df.to_csv(Path.cwd() / "data" / "outputs" / "submission_kaggle.csv", index=False)
 
 if __name__ == "__main__":
     main()
