@@ -126,6 +126,7 @@ Wnioski z całości:
 
         **Macierz pomyłek (Confusion Matrix)**
 
+<!-- 
         | Rzeczywiste \ Przewidywane | business | entertainment | politics | sport | tech |
         | :--- | :---: | :---: | :---: | :---: | :---: |
         | **business** | **65** | 0 | 1 | 1 | 0 |
@@ -133,6 +134,9 @@ Wnioski z całości:
         | **politics** | 1 | 0 | **53** | 0 | 1 |
         | **sport** | 0 | 0 | 0 | **69** | 0 |
         | **tech** | 1 | 2 | 0 | 0 | **49** |
+-->
+
+![Macierz Pomyłek](img/conf_matrix.png)
 
 5. **Wysłanie na Kaggle**
    - Przygotowany zbiór testowy z konkursu na platformie Kaggle, składający się z 722 rekordów, został przepuszczony przez wytrenowany model. Uzyskane predykcje zostały wysłane w formacie .csv jako *Late Submission*. Obowiązującą metryką w wyzwaniu była dokładność (*Accuracy*). Udało się osiągnąć wynik na poziomie **0.98367**. Jest to wynik wyższy niż najwyższy rezultat znajdujący się obecnie w tabeli wyników (**0.98231**).

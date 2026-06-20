@@ -36,7 +36,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
 
     y_pred = nlp.predict.predict_category(X_test=X_test, model=model)
 
-    nlp.predict.evaluate_predictions(y_pred, y_test)
+    nlp.predict.evaluate_predictions(y_pred, y_test, model=model)
 
 
     # --- Utworzenie submission na platforme Kaggle i sprawdzenie wyników ---
