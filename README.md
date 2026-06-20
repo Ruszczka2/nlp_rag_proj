@@ -45,11 +45,12 @@ Struktura projektu przedstawia się następująco:
 ├── src/
 │   └── text_lab/
 │       ├── __init__.py
-│       ├── io.py        # wczytywanie/zapis danych
-│       ├── clean.py     # czyszczenie tekstu
-│       ├── features.py  # TfidfVectorizer, przygotowanie X, y
-│       ├── train.py     # trening + zapis modelu
-│       └── predict.py   # predykcja na nowym tekście
+│       ├── io.py           # wczytywanie/zapis danych
+│       ├── clean.py        # czyszczenie tekstu
+│       ├── features.py     # TfidfVectorizer, przygotowanie X, y
+│       ├── tokenization.py # stemming, Lametyzacja
+│       ├── train.py        # trening + zapis modelu
+│       └── predict.py      # predykcja na nowym tekście
 │
 ├── notebooks/
 │   └── 01_eda.ipynb # eksploracja danych
@@ -122,11 +123,11 @@ Wnioski z całości:
         | **weighted avg** | 0.98 | 0.98 | 0.98 | 298 |
 
 
-    - Nagłówki kolumn (Przewidywane) i wierszy (Rzeczywiste) odpowiadają kolejno klasom: *business, entertainment, politics, sport, tech*.
-
-        **Macierz pomyłek (Confusion Matrix)**
+    - Nagłówki kolumn (*Predicted*) i wierszy (*True*) odpowiadają kolejno klasom: *business, entertainment, politics, sport, tech*.
 
 <!-- 
+        **Macierz pomyłek (Confusion Matrix)**
+
         | Rzeczywiste \ Przewidywane | business | entertainment | politics | sport | tech |
         | :--- | :---: | :---: | :---: | :---: | :---: |
         | **business** | **65** | 0 | 1 | 1 | 0 |
@@ -138,8 +139,21 @@ Wnioski z całości:
 
 ![Macierz Pomyłek](img/conf_matrix.png)
 
-5. **Wysłanie na Kaggle**
-   - Przygotowany zbiór testowy z konkursu na platformie Kaggle, składający się z 722 rekordów, został przepuszczony przez wytrenowany model. Uzyskane predykcje zostały wysłane w formacie .csv jako *Late Submission*. Obowiązującą metryką w wyzwaniu była dokładność (*Accuracy*). Udało się osiągnąć wynik na poziomie **0.98367**. Jest to wynik wyższy niż najwyższy rezultat znajdujący się obecnie w tabeli wyników (**0.98231**).
+5. **Lematyzacja i Stemming**
+    - Zaimoplementowano możliwość wykonania operacji normalizacji tekstu przez odpowiednie flagi parsera. Wykorzystano bibliotekę PyStemmer dla stemmingu oraz spaCy dla lematyzacji, dla której wykorzystano model '*en_core_web_trf*' opierający się na transformerze. Poniżej znajdują się macierze pomyłek dla poszczególnych wersji:
+
+    **Stemming**
+
+    ![Stemming](img/stem_conf_matrix.png)
+
+    **Lematyzacja**
+
+    ![Lematyzacja](img/lem_conf_matrix.png)
+
+
+
+6. **Wysłanie na Kaggle**
+   - Przygotowany zbiór testowy z konkursu na platformie Kaggle, składający się z 722 rekordów, został przepuszczony przez wytrenowane modele. Uzyskane predykcje zostały wysłane w formacie .csv jako *Late Submission*. Obowiązującą metryką w wyzwaniu była dokładność (*Accuracy*). Udało się osiągnąć wynik na poziomie **0.98367** równy dla każdego utworzonego modelu. Jest to wynik wyższy niż najwyższy rezultat znajdujący się obecnie w tabeli wyników (**0.98231**).
 
 ## Źródło
 

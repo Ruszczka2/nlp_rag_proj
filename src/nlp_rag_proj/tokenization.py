@@ -1,6 +1,5 @@
 import spacy
 import torch
-import Stemmer
 import pandas as pd
 
 def init_gpu() -> bool:
