@@ -9,7 +9,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def load_model(load_path: Path = Path(Path.cwd() / "models" / "tfidf_svc.joblib")):
+def load_model(load_path: Path):
 
     if not load_path.is_file():
         raise FileNotFoundError(f"Model nie istnieje pod ścieżką: {load_path}")

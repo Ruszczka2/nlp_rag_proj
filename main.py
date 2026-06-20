@@ -39,7 +39,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
     X_test = nlp.clean.apply_nlp(X_test, args, stemmer=stemmer, nlp_obj=nlp_obj)
 
     if model_path.exists():
-        model = nlp.predict.load_model()
+        model = nlp.predict.load_model(model_path)
     else:
         X_train = nlp.clean.apply_nlp(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
         print(f"Model has not beed found: {model_path}\nTraining model...\n")
@@ -68,10 +68,10 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--submit", action="store_true", help="Wygeneruj plik submission_kaggle.csv")
+    parser.add_argument("--submit", action="store_true", help="Wygeneruj plik submission_kaggle.csv")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-n", "--no-norm", action="store_true", help="Nie normalizuj tekstu")
-    group.add_argument("-st", "--stem", action="store_true", help="Stemming tekstu")
+    group.add_argument("-s", "--stem", action="store_true", help="Stemming tekstu")
     group.add_argument("-l", "--lem", action="store_true", help="Lematyzacja tekstu")
     args = parser.parse_args()
 

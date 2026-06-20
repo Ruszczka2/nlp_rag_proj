@@ -9,6 +9,7 @@
 - [x] Opisać najważniejsze obserwacje
 - [x] Wynik na Kaggle
 - [x] Dodać Stemming i Lematyzacje
+- [ ] Dodać testy tokenization.py
 - [ ] RAG
 - [ ] Dodać sekcję instalacji
 
@@ -154,7 +155,7 @@ Wnioski z całości:
 
 
 6. **Wysłanie na Kaggle**
-   - Przygotowany zbiór testowy z konkursu na platformie Kaggle, składający się z 722 rekordów, został przepuszczony przez wytrenowane modele. Uzyskane predykcje zostały wysłane w formacie .csv jako *Late Submission*. Obowiązującą metryką w wyzwaniu była dokładność (*Accuracy*). Udało się osiągnąć wynik na poziomie **0.98367** równy dla każdego utworzonego modelu. Jest to wynik wyższy niż najwyższy rezultat znajdujący się obecnie w tabeli wyników (**0.98231**).
+   - Przygotowany zbiór testowy z konkursu na platformie Kaggle, składający się z 722 rekordów, został przepuszczony przez wytrenowane modele. Uzyskane predykcje zostały wysłane w formacie .csv jako *Late Submission*. Obowiązującą metryką w wyzwaniu była dokładność (*Accuracy*). Udało się osiągnąć wynik na poziomie **0.98367** dla modelu bez normalizacji tekstu. Użycie stemmingu pogorszyło wynik do **0.94421**, a lematyzacja do **0.97959**. Uzyskany wynik jest wyższy niż najwyższy rezultat znajdujący się obecnie w tabeli wyników (**0.98231**). Oznacza to, że w tym przypadku odpowiednie czyszczenie danych tekstowych było najlepszym rozwiązaniem.
 
 ## Źródło
 
