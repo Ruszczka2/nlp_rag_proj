@@ -3,7 +3,7 @@ from sklearn.svm import LinearSVC, SVC
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
 from nlp_rag_proj.features import build_vectorizer
-from nlp_rag_proj.predict import load_model
+from nlp_rag_proj.io import load_model
 from pathlib import Path
 import pandas as pd
 import joblib

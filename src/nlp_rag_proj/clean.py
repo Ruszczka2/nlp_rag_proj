@@ -34,15 +34,15 @@ def apply_nlp(series: pd.Series, args: Any | None, *, stemmer, nlp_obj) -> pd.Se
         if not isinstance(series, pd.Series):
             raise TypeError(f"Expected pd.Series, got: {type(series)}")
         
-        processed = series.apply(normalize_text)
-        texts_to_process = processed.tolist()
+        series = series.apply(normalize_text)
+        texts_to_process = series.tolist()
 
         if args.stem:
-             stem(series, texts_to_process, stemmer)
+            series = stem(series, texts_to_process, stemmer)
         elif args.lem:
-            lemmatize(series, texts_to_process, nlp_obj)
+            series = lemmatize(series, texts_to_process, nlp_obj)
         
-        return processed
+        return series
 
 if __name__ == "__main__":
     text = """

@@ -1,4 +1,5 @@
 from pathlib import Path
+import joblib
 import pandas as pd
 
 DATA_DIR = Path.cwd() / "data" / "raw"
@@ -23,6 +24,12 @@ def load_bbc_csv(*, set_type: str = None) -> pd.DataFrame:
     
     return df
 
+def load_model(load_path: Path):
+
+    if not load_path.is_file():
+        raise FileNotFoundError(f"Model nie istnieje pod ścieżką: {load_path}")
+    
+    return joblib.load(load_path)
 
 if __name__ == "__main__":
     df = load_bbc_csv(set_type="train")

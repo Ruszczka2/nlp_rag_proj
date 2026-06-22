@@ -1,27 +1,15 @@
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report, confusion_matrix
 
-from pathlib import Path
 import pandas as pd
-import joblib
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-
-
-def load_model(load_path: Path):
-
-    if not load_path.is_file():
-        raise FileNotFoundError(f"Model nie istnieje pod ścieżką: {load_path}")
-    
-    return joblib.load(load_path)
 
 def predict_category(
         X_test: pd.Series,
         model: Pipeline
     ) -> np.ndarray[tuple[int, int], np.dtype[str]]:
-
-    print(type(model.predict(X_test)))
 
     return model.predict(X_test)
 
@@ -54,5 +42,4 @@ def evaluate_predictions(
 
 
 if __name__ == "__main__":
-    y_pred = ""
-    load_model()
+    pass
