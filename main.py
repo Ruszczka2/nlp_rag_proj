@@ -4,11 +4,9 @@ import pandas as pd
 import argparse
 
 import spacy
-from functools import partial
 import Stemmer
 
 import nlp_rag_proj as nlp
-
 
 def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / "models" / "tfidf_svc.joblib"):
 
@@ -19,6 +17,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
     stemmer = None
     nlp_obj = None
     path_suf = None
+    linear_svc = True
 
     if args.stem:
         print("\nLoading stem model...")
@@ -34,16 +33,29 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
     else:
         path_suf = "tfidf_svc"
 
+    if args.non_linear:
+        path_suf += '_nl'
+        linear_svc = False
+
     model_path = Path.cwd() / "models" / f"{path_suf}.joblib"
 
     X_test = nlp.clean.apply_nlp(X_test, args, stemmer=stemmer, nlp_obj=nlp_obj)
 
-    if model_path.exists():
-        model = nlp.predict.load_model(model_path)
+    if model_path.exists() and not args.force_train:
+        try:
+            model = nlp.predict.load_model(model_path)
+        except (IOError, ValueError, RuntimeError) as e:
+            print(f"Error during model loading from {model_path}: {e}\nTraining model...\n")
+            X_train = nlp.clean.apply_nlp(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
+            model = nlp.train.train(X=X_train, y=y_train, model_path=model_path, linear_svc=linear_svc)
     else:
+        if not model_path.exists():
+            print(f"Model has not beed found: {model_path}\nTraining model...\n")
+        elif args.force_train:
+            print(f"Force train flag is: {args.force_train}\nTraining model...\n")
+
         X_train = nlp.clean.apply_nlp(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
-        print(f"Model has not beed found: {model_path}\nTraining model...\n")
-        model = nlp.train.train(X=X_train, y=y_train, model_path=model_path)
+        model = nlp.train.train(X=X_train, y=y_train, model_path=model_path, linear_svc=linear_svc)
 
     y_pred = nlp.predict.predict_category(X_test=X_test, model=model)
 
@@ -69,6 +81,8 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--submit", action="store_true", help="Wygeneruj plik submission_kaggle.csv")
+    parser.add_argument("-ft", "--force-train", action="store_true", help="Wymuś trenowanie modelu mimo już istniejącego")
+    parser.add_argument("-nl", "--non-linear", action="store_true", help="Użycie nieliniowego kernela dla klasyfikatora SVC")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-n", "--no-norm", action="store_true", help="Nie normalizuj tekstu")
     group.add_argument("-s", "--stem", action="store_true", help="Stemming tekstu")

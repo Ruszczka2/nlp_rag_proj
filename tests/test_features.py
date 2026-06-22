@@ -5,7 +5,7 @@ import pytest
 
 @pytest.fixture
 def dummy_dataframe():
-    # Definiujemy bazowe dane (10 wierszy), w których każda klasa ma min. 2 wpisy
+    # Definiuje bazowe dane (10 wierszy)
     base_data = {
         "text": [
             "Article one text", "Article two text", 
