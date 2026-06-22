@@ -152,9 +152,10 @@ Wnioski z całości:
 
     ![Lematyzacja](img/lem_conf_matrix.png)
 
+6. **Dodanie nieliniowego SVM**
+    - Postanowiono przetestować nieliniową wersję modelu SVM. Sprawdzono jądra radialnej funcji bazowej (rbf) oraz wielomianowej (poly). Po dostrajaniu hiperparametrów najlepszym wyborem była rbf.
 
-
-6. **Wysłanie na Kaggle**
+7. **Wysłanie na Kaggle**
    - Przygotowany zbiór testowy z konkursu na platformie Kaggle, składający się z 722 rekordów, został przepuszczony przez wytrenowane modele. Uzyskane predykcje zostały wysłane w formacie .csv jako *Late Submission*. Obowiązującą metryką w wyzwaniu była dokładność (*Accuracy*). Udało się osiągnąć wynik na poziomie **0.98367** dla modelu bez normalizacji tekstu. Użycie stemmingu pogorszyło wynik do **0.94421**, a lematyzacja do **0.97959**. Uzyskany wynik jest wyższy niż najwyższy rezultat znajdujący się obecnie w tabeli wyników (**0.98231**). Oznacza to, że w tym przypadku odpowiednie czyszczenie danych tekstowych było najlepszym rozwiązaniem.
 
 ## Źródło

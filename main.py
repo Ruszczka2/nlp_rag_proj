@@ -43,7 +43,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
 
     if model_path.exists() and not args.force_train:
         try:
-            model = nlp.predict.load_model(model_path)
+            model = nlp.io.load_model(model_path)
         except (IOError, ValueError, RuntimeError) as e:
             print(f"Error during model loading from {model_path}: {e}\nTraining model...\n")
             X_train = nlp.clean.apply_nlp(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
