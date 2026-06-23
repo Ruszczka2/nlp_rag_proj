@@ -7,14 +7,14 @@ def predict_sample(model: Pipeline, list_text: list[str]) -> list[str]:
     if isinstance(list_text, str):
         list_text = [list_text]
 
-    if not all(isinstance(element, str) for element in list_text):
+    if not list_text and not all(isinstance(element, str) for element in list_text):
         raise TypeError(f"all elements in list_text must be {type(str)}")
     
     prediction = model.predict(list_text)
     return prediction
 
 if __name__ == "__main__":
-    text1 = """
+    text_sport = """
 
     When Noni Madueke was named in England's starting line-up for their World Cup opener against Croatia it was the latest moment in what has been a dramatic season for the Arsenal winger.
 
@@ -68,7 +68,7 @@ Saka continues to recover from his Achilles issue and is not expected to start u
 And with another start for Madueke likely against Ghana on Tuesday (21:00 BST), he has another chance to stake his claim that he is not just a back-up to Saka.
 
     """
-    text2 = """
+    text_politics = """
 Sir Keir Starmer has said he will quit as Labour Party leader, paving the way for a contest to decide a new prime minister.
 
 Speaking in Downing Street, Sir Keir said he accepted he was not best placed to lead Labour into the next general election and he had informed the King of his decision to step down.
@@ -173,7 +173,7 @@ Zack Polanski, leader of the Green Party of England and Wales, said people would
 
 
     """
-    text3 = """
+    text_entertainment = """
 Scroll through TikTok for long enough and you'll find short films about fictional relationships, with painstaking fan edits, imagined future storylines, AI-generated posters and millions of comments debating them as if they're real.
 
 This level of fandom has transformed young adult romance, often found in novels, into one of streaming's safest bets.
@@ -270,8 +270,8 @@ Banks says they were conscious of portraying two young people still figuring the
 
 The actress adds that one of the aspects she most enjoyed was Noah's resilience, saying "it was so lovely for me to play a strong young female character and I hope that's reflected on the screen".
     """
-    text4 = "mleko"
+    text_random = "mleko"
     model: Pipeline = load_model(Path.cwd() / "models" / "tfidf_svc_nl.joblib")
-    print(predict_sample(model, [text1, text2, text3, text4]))
-    print(predict_sample(model, text1))
+    print(predict_sample(model, [text_sport, text_politics, text_entertainment, text_random]))
+    print(predict_sample(model, text_sport))
     #print(predict_sample(model, 5))
