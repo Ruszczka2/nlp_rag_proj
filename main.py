@@ -3,28 +3,34 @@ from typing import Any
 import pandas as pd
 import argparse
 import time
+import shutil
 
 from nlp_rag_proj import clean, features, io, parrallel, predict, rag, sample, tokenization, train
 
 def multiprocess_test(args: Any | None = None) -> None:
     
     df = io.load_bbc_csv(set_type="train")
+    ext_path = Path.cwd() / "data" / "extracted"
 
-    extracted_series = parrallel.extract_random_articles(num_articles=args.articles_num, df=df)
+    parrallel.extract_random_articles(num_articles=args.articles_num, df=df, ext_path=ext_path)
 
     start_time = time.perf_counter()
-    parrallel.sequential(extracted_series)
+    parrallel.sequential(ext_path)
     end_time = time.perf_counter()
 
     sequential_elapsed_time = end_time - start_time
     print(f"Operation Sequential: {sequential_elapsed_time:.6f} sec")
 
     start_time = time.perf_counter()
-    parrallel.parrallel(extracted_series)
+    parrallel.parrallel(ext_path)
     end_time = time.perf_counter()
 
     sequential_elapsed_time = end_time - start_time
     print(f"Operation Sequential: {sequential_elapsed_time:.6f} sec")
+
+    if ext_path.exists() and ext_path.is_dir():
+        shutil.rmtree(ext_path)
+
 
 
 
