@@ -3,10 +3,22 @@ from typing import Any
 import pandas as pd
 import argparse
 
+from absl import app
+from absl import flags
+from absl import logging
+
+
 import spacy
 import Stemmer
 
 import nlp_rag_proj as nlp
+
+def extract_random_articles(num_articles: int) -> None:
+    
+    if not isinstance(num_articles, int):
+        raise TypeError(f"num_articles must be {type(int)}, but it is: {type(num_articles)}")
+
+    pass
 
 def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / "models" / "tfidf_svc.joblib"):
 
@@ -82,11 +94,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--submit", action="store_true", help="Wygeneruj plik submission_kaggle.csv")
     parser.add_argument("-ft", "--force-train", action="store_true", help="Wymuś trenowanie modelu mimo już istniejącego")
-    parser.add_argument("-nl", "--non-linear", action="store_true", help="Użycie nieliniowego kernela dla klasyfikatora SVC")
+    parser.add_argument("-nl", "--non-linear", action="store_true", help="Użycie nieliniowego kernela dla klasyfikatora SVM")
+    parser.add_argument("-an", "--articles_num", type=int, default=None, help="Użycie nieliniowego kernela dla klasyfikatora SVM")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-n", "--no-norm", action="store_true", help="Nie normalizuj tekstu")
     group.add_argument("-s", "--stem", action="store_true", help="Stemming tekstu")
     group.add_argument("-l", "--lem", action="store_true", help="Lematyzacja tekstu")
     args = parser.parse_args()
 
-    tfidf_svc_pipeline(args)
+    if args.articles_num is None:
+        tfidf_svc_pipeline(args)
+
+    else:
+        if args.articles_num < 100:
+            print(f"min articles is 100, but was given {args.articles_num}. Changing to 100")
+            args.articles_num = 100
+
+        if args.articles_num > 500:
+            print(f"max articles is 500, but was given {args.articles_num}. Changing to 500")
+            args.articles_num = 500
+
+        extract_random_articles(args.articles_num)
