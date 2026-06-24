@@ -3,8 +3,6 @@ import string
 from typing import Any
 import pandas as pd
 
-from nlp_rag_proj.tokenization import  stem, lemmatize
-
 def normalize_text(text: str) -> str:
 
     # Sprawdzenie czy to string
@@ -22,14 +20,14 @@ def normalize_text(text: str) -> str:
     text = re.sub(rf'[{re.escape(string.punctuation.replace('$',''))}]', '', text)
 
     # Usuwanie cyfr
-    text = re.sub(r'[1234567890]', '', text)
+    text = re.sub(r'[0-9]', '', text)
 
     # Używanie jednej spacji między słowami
     text = " ".join(text.split())
 
     return text
  
-def apply_nlp(series: pd.Series, args: Any | None, *, stemmer, nlp_obj) -> pd.Series:
+def apply_text_preprocessing(series: pd.Series, args: Any | None, *, stemmer, nlp_obj) -> pd.Series:
         
         if not isinstance(series, pd.Series):
             raise TypeError(f"Expected pd.Series, got: {type(series)}")
@@ -38,8 +36,10 @@ def apply_nlp(series: pd.Series, args: Any | None, *, stemmer, nlp_obj) -> pd.Se
         texts_to_process = series.tolist()
 
         if args.stem:
+            from nlp_rag_proj.tokenization import stem
             series = stem(series, texts_to_process, stemmer)
         elif args.lem:
+            from nlp_rag_proj.tokenization import lemmatize
             series = lemmatize(series, texts_to_process, nlp_obj)
         
         return series
