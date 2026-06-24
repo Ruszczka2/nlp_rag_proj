@@ -1,9 +1,13 @@
 from pathlib import Path
 from typing import Any
 import pandas as pd
+import numpy as np
 import argparse
 import time
 import shutil
+import os
+from multiprocessing import Pool
+
 
 from nlp_rag_proj import clean, features, io, parrallel, predict, rag, sample, tokenization, train
 
@@ -14,28 +18,30 @@ def multiprocess_test(args: Any | None = None) -> None:
 
     parrallel.extract_random_articles(num_articles=args.articles_num, df=df, ext_path=ext_path)
 
-    start_time = time.perf_counter()
-    parrallel.sequential(ext_path)
-    end_time = time.perf_counter()
+    file_paths = [os.path.join(ext_path, f) for f in os.listdir(ext_path) if f.endswith(".txt")]
 
-    sequential_elapsed_time = end_time - start_time
-    print(f"Operation Sequential: {sequential_elapsed_time:.6f} sec")
 
-    start_time = time.perf_counter()
-    parrallel.parrallel(ext_path)
-    end_time = time.perf_counter()
+    times_list_seq, times_list_par = [], []
 
-    sequential_elapsed_time = end_time - start_time
-    print(f"Operation Sequential: {sequential_elapsed_time:.6f} sec")
+    for _ in range(5):
+        start_time = time.perf_counter()
+        for full_path in file_paths:
+            parrallel.process_single_file(full_path)
+        end_time = time.perf_counter()
+        times_list_seq.append(end_time - start_time)
+    print(f"Operation Sequential: {np.mean(times_list_seq):.6f} sec")
+
+    with Pool() as p:
+        for _ in range(5):
+            start_time = time.perf_counter()
+            p.map(parrallel.process_single_file, file_paths)
+            end_time = time.perf_counter()
+            times_list_par.append(end_time - start_time)
+
+    print(f"Operation Parrallel: {np.mean(times_list_par):.6f} sec")
 
     if ext_path.exists() and ext_path.is_dir():
         shutil.rmtree(ext_path)
-
-
-
-
-
-
 
 
 def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / "models" / "tfidf_svc.joblib") -> None:
@@ -71,14 +77,14 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
 
     model_path = Path.cwd() / "models" / f"{path_suf}.joblib"
 
-    X_test = clean.apply_nlp(X_test, args, stemmer=stemmer, nlp_obj=nlp_obj)
+    X_test = clean.apply_text_preprocessing(X_test, args, stemmer=stemmer, nlp_obj=nlp_obj)
 
     if model_path.exists() and not args.force_train:
         try:
             model = io.load_model(model_path)
         except (IOError, ValueError, RuntimeError) as e:
             print(f"Error during model loading from {model_path}: {e}\nTraining model...\n")
-            X_train = clean.apply_nlp(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
+            X_train = clean.apply_text_preprocessing(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
             model = train.train(X=X_train, y=y_train, model_path=model_path, linear_svc=linear_svc)
     else:
         if not model_path.exists():
@@ -86,7 +92,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
         elif args.force_train:
             print(f"Force train flag is: {args.force_train}\nTraining model...\n")
 
-        X_train = clean.apply_nlp(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
+        X_train = clean.apply_text_preprocessing(X_train, args, stemmer=stemmer, nlp_obj=nlp_obj)
         model = train.train(X=X_train, y=y_train, model_path=model_path, linear_svc=linear_svc)
 
     y_pred = predict.predict_category(X_test=X_test, model=model)
@@ -99,7 +105,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
         df_test = io.load_bbc_csv(set_type="test")
 
         article_ids = df_test["articleid"]
-        X_test_test = clean.apply_nlp(df_test["text"], args, stemmer=stemmer, nlp_obj=nlp_obj)
+        X_test_test = clean.apply_text_preprocessing(df_test["text"], args, stemmer=stemmer, nlp_obj=nlp_obj)
 
         y_test_pred = model.predict(X_test_test)
 
@@ -133,3 +139,5 @@ if __name__ == "__main__":
         if args.articles_num > 500:
             print(f"max articles is 500, but was given {args.articles_num}. Changing to 500")
             args.articles_num = 500
+
+        multiprocess_test(args)

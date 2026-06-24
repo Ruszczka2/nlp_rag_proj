@@ -27,7 +27,7 @@ def normalize_text(text: str) -> str:
 
     return text
  
-def apply_nlp(series: pd.Series, args: Any | None, *, stemmer, nlp_obj) -> pd.Series:
+def apply_text_preprocessing(series: pd.Series, args: Any | None, *, stemmer, nlp_obj) -> pd.Series:
         
         if not isinstance(series, pd.Series):
             raise TypeError(f"Expected pd.Series, got: {type(series)}")
