@@ -22,8 +22,9 @@ def multiprocess_test(args: Any | None = None) -> None:
 
 
     times_list_seq, times_list_par = [], []
+    max_iter = 20
 
-    for _ in range(5):
+    for _ in range(max_iter):
         start_time = time.perf_counter()
         for full_path in file_paths:
             parrallel.process_single_file(full_path)
@@ -32,7 +33,7 @@ def multiprocess_test(args: Any | None = None) -> None:
     print(f"Operation Sequential: {np.mean(times_list_seq):.6f} sec")
 
     with Pool() as p:
-        for _ in range(5):
+        for _ in range(max_iter):
             start_time = time.perf_counter()
             p.map(parrallel.process_single_file, file_paths)
             end_time = time.perf_counter()

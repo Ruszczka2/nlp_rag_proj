@@ -25,14 +25,14 @@ def extract_random_articles(df: pd.DataFrame, num_articles: int, ext_path: Path)
 
         
 def process_single_file(full_path: str) -> None:
-    for _ in range(10):  # Sztuczne obciążenie z Twojego benchmarku
+    for _ in range(1):
         with open(full_path, "r", encoding="utf-8") as plik:
             text = plik.read()
             text_normalized = normalize_text(text)
             text_words = text_normalized.split()
-            count_words = len(text_words)
-            text_sorted_aplhabet = sorted(text_words)
-            text_sorted_length = sorted(text_words, key=len, reverse=True)
+            len(text_words)
+            sorted(text_words)
+            sorted(text_words, key=len, reverse=True)
     
 
 if __name__ == "__main__":
