@@ -4,9 +4,6 @@ from nlp_rag_proj.clean import normalize_text
 
 def chunk_text(text: str, chunk_size: int, overlap: int) -> list[str]:
     text_normalized = normalize_text(text)
-
-    
-
     pass
 
 def build_index(docs_dir): # → embeddingi (np. sentence-transformers/all-MiniLM-L6-v2 lokalnie)
