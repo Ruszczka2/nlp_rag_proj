@@ -9,14 +9,14 @@ import os
 from multiprocessing import Pool
 
 
-from nlp_rag_proj import clean, features, io, parrallel, predict, rag, sample, tokenization, train
+from nlp_rag_proj import clean, features, io, parrallel, predict, rag, tokenization, train
 
 def multiprocess_test(args: Any | None = None) -> None:
     
     df = io.load_bbc_csv(set_type="train")
     ext_path = Path.cwd() / "data" / "extracted"
 
-    parrallel.extract_random_articles(num_articles=args.articles_num, df=df, ext_path=ext_path)
+    io.extract_random_articles(num_articles=args.articles_num, df=df, ext_path=ext_path)
 
     file_paths = [os.path.join(ext_path, f) for f in os.listdir(ext_path) if f.endswith(".txt")]
 

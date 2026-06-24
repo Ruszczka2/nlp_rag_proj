@@ -16,7 +16,7 @@ def init_gpu() -> bool:
     return False
 
 def tokenize(text: str) -> list[str]:
-    pass
+    return text.split()
 
 def stem(series: pd.Series, texts_to_process: list[str], stemmer) -> pd.Series:
     print("Running stem...")
