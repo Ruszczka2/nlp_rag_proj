@@ -8,6 +8,7 @@ dependencies = [
     "click>=8.4.1",
     "cupy-cuda12x>=14.1.1",
     "en-core-web-trf",
+    "faiss-cpu>=1.14.3",
     "ipykernel>=7.3.0",
     "kaggle>=2.2.1",
     "matplotlib>=3.11.0",
