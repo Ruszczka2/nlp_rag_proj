@@ -127,6 +127,12 @@ def retrieve(query: str, top_k: int = 4): # → cosine similarity
 
     idx_top_k = sorted_idx[:top_k]
     print(idx_top_k)
+    print(similar_array[idx_top_k])
+
+    with open(file=Path.cwd() / "data" / "emb" / "emb_dict.pickle", mode='rb') as f:
+        emb_dict = pickle.load(f, encoding='utf-8')\
+    
+    print([emb_dict['chunks'][i] for i in idx_top_k])
 
 def answer(query): # → sklej kontekst + prompt do LLM (API lub Ollama lokalnie)
     pass
@@ -136,7 +142,7 @@ if __name__ == "__main__":
         emb_dict = pickle.load(f, encoding='utf-8')
     #retrieve('a person who is president of USA.', 5)
 
-    calc_cosine_similarity(('a person who is president of USA.'))
+    retrieve('grand tournament')
 
     
 
