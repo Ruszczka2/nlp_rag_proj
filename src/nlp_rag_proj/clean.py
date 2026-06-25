@@ -3,7 +3,7 @@ import string
 from typing import Any
 import pandas as pd
 
-def normalize_text(text: str, rag: bool = False) -> str:
+def normalize_text(text: str) -> str:
 
     # Sprawdzenie czy to string
     if not isinstance(text, str):
@@ -13,17 +13,14 @@ def normalize_text(text: str, rag: bool = False) -> str:
     text = re.sub(r'https?://\S+', '', text)
     text = re.sub(r'www\.\S+', '', text)
 
-    if not rag:
-        # Sprowadzenie do małych liter
-        text = text.lower()
-        
-        # Usuwanie cyfr
-        text = re.sub(r'[0-9]', '', text)
-        
-        # Usuwanie znaków interpunkcyjnych
-        text = re.sub(rf'[{re.escape(string.punctuation.replace('$',''))}]', '', text)
-    else:
-        text = re.sub(r'\. ([a-ząćęłńóśźż])', lambda m: f". {m.group(1).upper()}", text)
+    # Sprowadzenie do małych liter
+    text = text.lower()
+    
+    # Usuwanie cyfr
+    text = re.sub(r'[0-9]', '', text)
+    
+    # Usuwanie znaków interpunkcyjnych
+    text = re.sub(rf'[{re.escape(string.punctuation.replace('$',''))}]', '', text)
 
     # Używanie jednej spacji między słowami
     text = " ".join(text.split())

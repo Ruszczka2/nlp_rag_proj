@@ -1,4 +1,3 @@
-from nlp_rag_proj.clean import normalize_text
 from nlp_rag_proj.io import load_bbc_csv
 from pathlib import Path
 import pickle
@@ -6,7 +5,7 @@ import pandas as pd
 import numpy as np
 import faiss
 
-def embed_query(query: str, emb: str = 'docs') -> np.ndarray:
+def embed_query(queries: list[str], emb: str = 'docs') -> np.ndarray:
     if emb == 'docs':
         from sentence_transformers import SentenceTransformer
         model = SentenceTransformer("sentence-transformers/distiluse-base-multilingual-cased-v1", device='cuda')
@@ -16,9 +15,9 @@ def embed_query(query: str, emb: str = 'docs') -> np.ndarray:
     else:
         raise ValueError("emb must be either 'docs' or 'bbc'")
     
-    return model.encode(query)
+    return model.encode(queries)
 
-def calc_cosine_similarity(query: str, emb: str = 'docs') -> np.ndarray[np.float32]:
+def calc_cosine_similarity(queries: list[str], emb: str = 'docs') -> np.ndarray[np.float32]:
 
     if emb == 'docs':
         with open(file=Path.cwd() / "data" / "emb" / "emb_dict_docs.pickle", mode='rb') as f:
@@ -29,12 +28,12 @@ def calc_cosine_similarity(query: str, emb: str = 'docs') -> np.ndarray[np.float
     else:
         raise ValueError("emb must be either 'docs' or 'bbc'")
 
-    query_vect = embed_query(query, emb=emb)
+    queries_vect = embed_query(queries, emb=emb)
 
     embeddings_vect = np.array(emb_dict['embeddings'])
 
     # Znormalizowane do 1 (L2) - nie muszę dzielić przez pierwiastki kwadratów v1 i v2 - wystarczy mnożenie macierzowe
-    similar_array = np.dot(embeddings_vect, query_vect)
+    similar_array = np.dot(embeddings_vect, queries_vect.T)
 
     #sorted_similar_array = similar_array[sorted_indices]
     #id_sim = (sorted_idx, sorted_similar_array)
@@ -117,7 +116,7 @@ def build_index_from_docs(docs_dir: Path = Path.cwd() / "docs") -> faiss.IndexFl
     
     return {'chunks': all_chunks,'embeddings': embeddings}
 
-def retrieve(query: str, top_k: int = 4, emb: str = 'docs'): # → cosine similarity
+def retrieve(queries: list[str], top_k: int = 4, emb: str = 'docs'): # → cosine similarity
     # xq = model.encode([query])
     # _, I = index.search(xq, top_k)
     # return(I)
@@ -131,30 +130,32 @@ def retrieve(query: str, top_k: int = 4, emb: str = 'docs'): # → cosine simila
     else:
         raise ValueError("emb must be either 'docs' or 'bbc'")
 
-    similar_array = calc_cosine_similarity(query, emb)
+    similar_array = calc_cosine_similarity(queries, emb)
 
-    idx = np.arange(similar_array.shape[0])
-    # '-similar_array' - żeby malejąco
-    sorted_indices = np.argsort(-similar_array)
-    sorted_idx = idx[sorted_indices]
+    idx_top_k = []
 
-    if top_k > sorted_idx.shape[0]:
-        raise ValueError(f"top_k ({top_k}) must be lower than {sorted_idx.shape[0]}")
+    for i in range(similar_array.shape[1] if similar_array.ndim > 1 else 1):
+        query_sim = similar_array[:, i] if similar_array.ndim > 1 else similar_array
+        # '-query_sim' - żeby malejąco
+        sorted_indices = np.argsort(-query_sim)
+        
+        if top_k > len(sorted_indices):
+            raise ValueError(f"top_k ({top_k}) must be lower than {len(sorted_indices)}")
+            
+        idx_top_k.extend(sorted_indices[:top_k])
 
-    idx_top_k = sorted_idx[:top_k]
-    # print(idx_top_k)
-    # print(similar_array[idx_top_k])
-
+    # Usunięcie duplikatów przy zachowaniu kolejności
+    idx_top_k = list(dict.fromkeys(idx_top_k))
 
     return [emb_dict['chunks'][i] for i in idx_top_k]
 
-def answer(query: str, top_k: int = 4, emb: str = 'docs'):
+def answer(queries: list[str], top_k: int = 4, emb: str = 'docs'):
     from ollama import chat
 
     if emb not in ['docs', 'bbc']:
         raise ValueError("emb must be either 'docs' or 'bbc'")
 
-    relevant_chunks = retrieve(query, top_k=top_k, emb=emb)
+    relevant_chunks = retrieve(queries, top_k=top_k, emb=emb)
     
     context = "\n---\n".join(relevant_chunks)
 
@@ -163,23 +164,23 @@ def answer(query: str, top_k: int = 4, emb: str = 'docs'):
         "na podstawie dostarczonego kontekstu. Jeśli w tekście nie ma odpowiedzi, "
         "napisz bezpośrednio, że nie dysponujesz taką wiedzą."
     )
-    
-    user_content = f"Kontekst:\n{context}\n\nPytanie: {query}"
+    answers = []
+    for query in queries:
+        user_content = f"Kontekst:\n{context}\n\nPytanie: {query}"
 
-    response = chat(
-        model='llama3.2',
-        messages=[
-            {'role': 'system', 'content': system_instruction},
-            {'role': 'user', 'content': user_content}
-        ],
-    )
-    
-    return response.message.content
+        response = chat(
+            model='llama3.2',
+            messages=[
+                {'role': 'system', 'content': system_instruction},
+                {'role': 'user', 'content': user_content}
+            ],
+        )
+        answers.append(response.message.content)
+        
+    return answers
 
 if __name__ == "__main__":
 
     # build_index_from_docs()
     # build_index_from_bbc()
-
-    ollama_answer = answer('Czym jest przeuczenie?')
-    print(ollama_answer)
+    pass
