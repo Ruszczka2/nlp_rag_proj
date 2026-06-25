@@ -15,7 +15,7 @@ def embed_query(queries: list[str], emb: str = 'docs') -> np.ndarray:
     else:
         raise ValueError("emb must be either 'docs' or 'bbc'")
     
-    return model.encode(queries)
+    return model.encode(queries, normalize_embeddings=True)
 
 def calc_cosine_similarity(queries: list[str], emb: str = 'docs') -> np.ndarray[np.float32]:
 
@@ -70,7 +70,7 @@ def build_index_from_bbc() -> faiss.IndexFlatL2: # → embeddingi
     for text in text_list:
         all_chunks.extend(chunk_text(text))
 
-    embeddings = model.encode(all_chunks)
+    embeddings = model.encode(all_chunks, normalize_embeddings=True)
 
     # Tu jest automatyczne wykorzystanie biblioteki faiss
     # index = faiss.IndexFlatL2(embeddings.shape[1])
@@ -100,13 +100,11 @@ def build_index_from_docs(docs_dir: Path = Path.cwd() / "docs") -> faiss.IndexFl
                 text = file.read()
                 all_chunks.extend(chunk_text(text))
 
-    embeddings = model.encode(all_chunks)
+    embeddings = model.encode(all_chunks, normalize_embeddings=True)
 
     # Tu jest automatyczne wykorzystanie biblioteki faiss
     # index = faiss.IndexFlatL2(embeddings.shape[1])
     # index.add(embeddings)
-
-    print(all_chunks)
 
     output_file = Path.cwd() / "data" / "emb" / "emb_dict_docs.pickle"
     output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -117,7 +115,7 @@ def build_index_from_docs(docs_dir: Path = Path.cwd() / "docs") -> faiss.IndexFl
     return {'chunks': all_chunks,'embeddings': embeddings}
 
 def retrieve(queries: list[str], top_k: int = 4, emb: str = 'docs'): # → cosine similarity
-    # xq = model.encode([query])
+    # xq = model.encode([query], normalize_embeddings=True)
     # _, I = index.search(xq, top_k)
     # return(I)
 
