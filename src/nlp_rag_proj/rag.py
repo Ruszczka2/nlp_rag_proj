@@ -6,17 +6,30 @@ import pandas as pd
 import numpy as np
 import faiss
 
-def embed_query(query: str) -> np.ndarray:
-    from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device='cuda')
+def embed_query(query: str, emb: str = 'docs') -> np.ndarray:
+    if emb == 'docs':
+        from sentence_transformers import SentenceTransformer
+        model = SentenceTransformer("sentence-transformers/distiluse-base-multilingual-cased-v1", device='cuda')
+    elif emb == 'bbc':
+        from sentence_transformers import SentenceTransformer
+        model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device='cuda')
+    else:
+        raise ValueError("emb must be either 'docs' or 'bbc'")
+    
     return model.encode(query)
 
-def calc_cosine_similarity(query: str) -> np.ndarray[np.float32]:
+def calc_cosine_similarity(query: str, emb: str = 'docs') -> np.ndarray[np.float32]:
 
-    with open(file=Path.cwd() / "data" / "emb" / "emb_dict.pickle", mode='rb') as f:
-        emb_dict = pickle.load(f, encoding='utf-8')
+    if emb == 'docs':
+        with open(file=Path.cwd() / "data" / "emb" / "emb_dict_docs.pickle", mode='rb') as f:
+            emb_dict = pickle.load(f, encoding='utf-8')
+    elif emb == 'bbc':
+        with open(file=Path.cwd() / "data" / "emb" / "emb_dict.pickle", mode='rb') as f:
+            emb_dict = pickle.load(f, encoding='utf-8')
+    else:
+        raise ValueError("emb must be either 'docs' or 'bbc'")
 
-    query_vect = embed_query(query)
+    query_vect = embed_query(query, emb=emb)
 
     embeddings_vect = np.array(emb_dict['embeddings'])
 
@@ -39,22 +52,20 @@ def chunk_text(text: str, chunk_size: int = 50, overlap: int = 10) -> list[str]:
     if not isinstance(chunk_size, int) or not isinstance(overlap, int):
         raise TypeError(f"inputs must be int: chunk_size ({type(chunk_size)}), overlap ({type(overlap)})")
     
-    text_normalized = normalize_text(text, rag=True)
+    text_normalized = text #normalize_text(text, rag=True)
     text_list = text_normalized.split()
 
     step = chunk_size - overlap
     chunks = [' '.join(text_list[i:i+chunk_size]) for i in range(0, len(text_list), step)]
     return chunks
 
-def build_index_from_bbc(df: pd.Series) -> faiss.IndexFlatL2: # → embeddingi
-
-    if not isinstance(df, pd.Series):
-        raise TypeError("df must be pd.Series")
+def build_index_from_bbc() -> faiss.IndexFlatL2: # → embeddingi
+    
+    df = load_bbc_csv(set_type="train")
+    text_list = df['text'].to_list()
     
     from sentence_transformers import SentenceTransformer
     model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device='cuda')
-
-    text_list = df.to_list()
     
     all_chunks = []
     for text in text_list:
@@ -74,7 +85,7 @@ def build_index_from_bbc(df: pd.Series) -> faiss.IndexFlatL2: # → embeddingi
     
     return {'chunks': all_chunks,'embeddings': embeddings}
 
-def build_index_from_docs(docs_dir: Path = Path.cwd() / "docs"): # → embeddingi
+def build_index_from_docs(docs_dir: Path = Path.cwd() / "docs") -> faiss.IndexFlatL2: # → embeddingi
 
     if not docs_dir.is_dir():
         raise FileNotFoundError(f"Docs directory doesnt exist here: {docs_dir}")
@@ -83,39 +94,44 @@ def build_index_from_docs(docs_dir: Path = Path.cwd() / "docs"): # → embedding
     model = SentenceTransformer("sentence-transformers/distiluse-base-multilingual-cased-v1")
 
     all_chunks = []
-    
-    df = load_bbc_csv(set_type="train")
-    text_list = df['text'].to_list()
-    print(len(text_list))
-    print(text_list[:10])
-
-    for text in text_list:
-        text_chunked = chunk_text(text)
-        all_chunks.extend(text_chunked)
-
-    print(len(all_chunks))
-    print(all_chunks[:10])
 
     for file_path in docs_dir.iterdir():
         if file_path.is_file():
             with open(file_path, 'r', encoding='utf-8') as file:
                 text = file.read()
-                text_chunked = chunk_text(text)
-                all_chunks.extend(text_chunked)
+                all_chunks.extend(chunk_text(text))
 
     embeddings = model.encode(all_chunks)
+
+    # Tu jest automatyczne wykorzystanie biblioteki faiss
+    # index = faiss.IndexFlatL2(embeddings.shape[1])
+    # index.add(embeddings)
+
+    print(all_chunks)
+
+    output_file = Path.cwd() / "data" / "emb" / "emb_dict_docs.pickle"
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(output_file, "wb") as f:
+        pickle.dump({'chunks': all_chunks,'embeddings': embeddings}, f)
     
-    index = faiss.IndexFlatL2(embeddings.shape[1])
-    index.add(embeddings)
+    return {'chunks': all_chunks,'embeddings': embeddings}
 
-    return index
-
-def retrieve(query: str, top_k: int = 4): # → cosine similarity
+def retrieve(query: str, top_k: int = 4, emb: str = 'docs'): # → cosine similarity
     # xq = model.encode([query])
     # _, I = index.search(xq, top_k)
     # return(I)
 
-    similar_array = calc_cosine_similarity(query)
+    if emb == 'docs':
+        with open(file=Path.cwd() / "data" / "emb" / "emb_dict_docs.pickle", mode='rb') as f:
+            emb_dict = pickle.load(f, encoding='utf-8')
+    elif emb == 'bbc':
+        with open(file=Path.cwd() / "data" / "emb" / "emb_dict.pickle", mode='rb') as f:
+            emb_dict = pickle.load(f, encoding='utf-8')
+    else:
+        raise ValueError("emb must be either 'docs' or 'bbc'")
+
+    similar_array = calc_cosine_similarity(query, emb)
 
     idx = np.arange(similar_array.shape[0])
     # '-similar_array' - żeby malejąco
@@ -126,23 +142,44 @@ def retrieve(query: str, top_k: int = 4): # → cosine similarity
         raise ValueError(f"top_k ({top_k}) must be lower than {sorted_idx.shape[0]}")
 
     idx_top_k = sorted_idx[:top_k]
-    print(idx_top_k)
-    print(similar_array[idx_top_k])
+    # print(idx_top_k)
+    # print(similar_array[idx_top_k])
 
-    with open(file=Path.cwd() / "data" / "emb" / "emb_dict.pickle", mode='rb') as f:
-        emb_dict = pickle.load(f, encoding='utf-8')\
+
+    return [emb_dict['chunks'][i] for i in idx_top_k]
+
+def answer(query: str, top_k: int = 4, emb: str = 'docs'):
+    from ollama import chat
+
+    if emb not in ['docs', 'bbc']:
+        raise ValueError("emb must be either 'docs' or 'bbc'")
+
+    relevant_chunks = retrieve(query, top_k=top_k, emb=emb)
     
-    print([emb_dict['chunks'][i] for i in idx_top_k])
+    context = "\n---\n".join(relevant_chunks)
 
-def answer(query): # → sklej kontekst + prompt do LLM (API lub Ollama lokalnie)
-    pass
+    system_instruction = (
+        "Jesteś pomocnym asystentem. Odpowiedz na pytanie użytkownika wyłącznie "
+        "na podstawie dostarczonego kontekstu. Jeśli w tekście nie ma odpowiedzi, "
+        "napisz bezpośrednio, że nie dysponujesz taką wiedzą."
+    )
+    
+    user_content = f"Kontekst:\n{context}\n\nPytanie: {query}"
+
+    response = chat(
+        model='llama3.2',
+        messages=[
+            {'role': 'system', 'content': system_instruction},
+            {'role': 'user', 'content': user_content}
+        ],
+    )
+    
+    return response.message.content
 
 if __name__ == "__main__":
-    with open(file=Path.cwd() / "data" / "emb" / "emb_dict.pickle", mode='rb') as f:
-        emb_dict = pickle.load(f, encoding='utf-8')
-    #retrieve('a person who is president of USA.', 5)
 
-    retrieve('grand tournament')
+    # build_index_from_docs()
+    # build_index_from_bbc()
 
-    
-
+    ollama_answer = answer('Czym jest przeuczenie?')
+    print(ollama_answer)

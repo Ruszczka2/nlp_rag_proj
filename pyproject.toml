@@ -13,6 +13,7 @@ dependencies = [
     "kaggle>=2.2.1",
     "matplotlib>=3.11.0",
     "numpy>=2.4.6",
+    "ollama>=0.6.2",
     "pandas>=3.0.3",
     "pystemmer>=3.1.0",
     "pytest>=9.1.0",
@@ -22,6 +23,7 @@ dependencies = [
     "spacy>=3.8.14",
     "spacy-transformers>=1.4.0",
     "torch>=2.10.0",
+    "zstd>=1.5.7.3",
 ]
 
 
