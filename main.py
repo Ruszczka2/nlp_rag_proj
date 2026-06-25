@@ -8,8 +8,21 @@ import shutil
 import os
 from multiprocessing import Pool
 
-
 from nlp_rag_proj import clean, features, io, parrallel, predict, rag, tokenization, train
+
+def rag_test() -> None:
+    prompts = [
+        'Czym jest nadmierne dopasowanie?', # Przeuczenie występuje, gdy model zbyt dokładnie dopasowuje się do danych treningowych
+        'Co to overfitting?', # Przeuczenie występuje, gdy model zbyt dokładnie dopasowuje się do danych treningowych
+        'Kiedy się ustawia i co kontrolują hiperparametry?', # przed treningiem i kontrolują proces uczenia
+        'Czy mogę użyć danych testowych do trenowania modelu?' # dopasowuj preprocessing i modele tylko na danych treningowych
+        ]
+    ollama_answers = rag.answer(prompts)
+
+    qa_dict = {prompt: ans for prompt, ans in zip(prompts, ollama_answers)}
+
+    for question, reply in qa_dict.items():
+        print(f"Pytanie: {question}\nOdpowiedź: {reply}\n{'-'*20}")
 
 def multiprocess_test(args: Any | None = None) -> None:
     
@@ -122,17 +135,15 @@ if __name__ == "__main__":
     parser.add_argument("--submit", action="store_true", help="Wygeneruj plik submission_kaggle.csv")
     parser.add_argument("-ft", "--force-train", action="store_true", help="Wymuś trenowanie modelu mimo już istniejącego")
     parser.add_argument("-nl", "--non-linear", action="store_true", help="Użycie nieliniowego kernela dla klasyfikatora SVM")
-    parser.add_argument("-an", "--articles_num", type=int, default=None, help="Użycie nieliniowego kernela dla klasyfikatora SVM")
+    parser.add_argument("-r", "--rag", action="store_true", help="Testowanie własnego RAG")
+    parser.add_argument("-an", "--articles_num", type=int, default=None, help="Testowanie multiprocessingu")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-n", "--no-norm", action="store_true", help="Nie normalizuj tekstu")
     group.add_argument("-s", "--stem", action="store_true", help="Stemming tekstu")
     group.add_argument("-l", "--lem", action="store_true", help="Lematyzacja tekstu")
     args = parser.parse_args()
 
-    if args.articles_num is None:
-        tfidf_svc_pipeline(args)
-
-    else:
+    if args.articles_num:
         if args.articles_num < 100:
             print(f"min articles is 100, but was given {args.articles_num}. Changing to 100")
             args.articles_num = 100
@@ -142,3 +153,8 @@ if __name__ == "__main__":
             args.articles_num = 500
 
         multiprocess_test(args)
+    elif args.rag:
+        rag_test()
+    else:
+        tfidf_svc_pipeline(args)
+

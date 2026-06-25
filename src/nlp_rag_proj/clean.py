@@ -9,18 +9,18 @@ def normalize_text(text: str) -> str:
     if not isinstance(text, str):
         return ""
 
-    # Sprowadzenie do małych liter
-    text = text.lower()
-
     # Usuwanie linków http lub www.
     text = re.sub(r'https?://\S+', '', text)
     text = re.sub(r'www\.\S+', '', text)
 
-    # Usuwanie znaków interpunkcyjnych
-    text = re.sub(rf'[{re.escape(string.punctuation.replace('$',''))}]', '', text)
-
+    # Sprowadzenie do małych liter
+    text = text.lower()
+    
     # Usuwanie cyfr
     text = re.sub(r'[0-9]', '', text)
+    
+    # Usuwanie znaków interpunkcyjnych
+    text = re.sub(rf'[{re.escape(string.punctuation.replace('$',''))}]', '', text)
 
     # Używanie jednej spacji między słowami
     text = " ".join(text.split())
