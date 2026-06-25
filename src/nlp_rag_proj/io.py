@@ -27,7 +27,7 @@ def load_bbc_csv(*, set_type: str = None) -> pd.DataFrame:
 def load_model(load_path: Path):
 
     if not load_path.is_file():
-        raise FileNotFoundError(f"Model nie istnieje pod ścieżką: {load_path}")
+        raise FileNotFoundError(f"Model doesnt exist here: {load_path}")
     
     return joblib.load(load_path)
 
