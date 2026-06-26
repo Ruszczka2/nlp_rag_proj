@@ -29,9 +29,13 @@ Struktura projektu przedstawia się następująco:
 ├── README.md
 ├── pyproject.toml
 ├── .gitignore
+├── img/
 │
 ├── data/
-│   └── raw/         # oryginalne pliki CSV
+│   ├── emb/        # pliki pickle zawierające osadzenia kontekstu do RAG
+│   └── raw/        # oryginalne pliki CSV
+│
+├── docs/           # wyjaśnienia pojęć o ML w formacie .md
 │
 ├── src/
 │   └── text_lab/
@@ -41,13 +45,17 @@ Struktura projektu przedstawia się następująco:
 │       ├── features.py     # TfidfVectorizer, przygotowanie X, y
 │       ├── tokenization.py # stemming, Lametyzacja
 │       ├── train.py        # trening + zapis modelu
+│       ├── train.py        # trening + zapis modelu
+│       ├── train.py        # trening + zapis modelu
 │       └── predict.py      # predykcja na nowym tekście
 │
 ├── notebooks/
-│   └── 01_eda.ipynb # eksploracja danych
+│   └── 01_eda.ipynb    # eksploracja danych
 │
 ├── tests/
 │   ├── test_clean.py
+│   ├── test_rag.py
+│   ├── test_train.py
 │   └── test_features.py
 │
 │── outputs/         # utworzone pliki CSV
