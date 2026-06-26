@@ -157,11 +157,17 @@ def answer(queries: list[str], top_k: int = 4, emb: str = 'docs'):
     
     context = "\n---\n".join(relevant_chunks)
 
-    system_instruction = (
-        "Jesteś pomocnym asystentem. Odpowiedz na pytanie użytkownika wyłącznie "
-        "na podstawie dostarczonego kontekstu. Jeśli w tekście nie ma odpowiedzi, "
-        "napisz bezpośrednio, że nie dysponujesz taką wiedzą."
-    )
+    system_instruction = {
+        'docs':
+            "Jesteś pomocnym asystentem. Odpowiedz na pytanie użytkownika wyłącznie "
+            "na podstawie dostarczonego kontekstu. Jeśli w tekście nie ma odpowiedzi, "
+            "napisz bezpośrednio, że nie dysponujesz taką wiedzą.",
+        'bbc':
+            "You are a helpful assistant. Answer the user's question only "
+            "based on the provided context. If the text does not contain the answer, "
+            "say directly that you do not have that knowledge."
+    }
+
     answers = []
     for query in queries:
         user_content = f"Kontekst:\n{context}\n\nPytanie: {query}"
@@ -169,7 +175,7 @@ def answer(queries: list[str], top_k: int = 4, emb: str = 'docs'):
         response = chat(
             model='llama3.2',
             messages=[
-                {'role': 'system', 'content': system_instruction},
+                {'role': 'system', 'content': system_instruction[emb]},
                 {'role': 'user', 'content': user_content}
             ],
         )

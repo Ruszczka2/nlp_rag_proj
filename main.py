@@ -52,7 +52,7 @@ def multiprocess_test(args: Any | None = None) -> None:
             end_time = time.perf_counter()
             times_list_par.append(end_time - start_time)
 
-    print(f"Operation Parrallel: {np.mean(times_list_par):.6f} sec")
+    print(f"Operation Parrallel:  {np.mean(times_list_par):.6f} sec")
 
     if ext_path.exists() and ext_path.is_dir():
         shutil.rmtree(ext_path)
@@ -66,7 +66,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
 
     stemmer = None
     nlp_obj = None
-    path_suf = None
+    path_suf = 'tfidf_svc'
     linear_svc = True
 
     if args.stem:
@@ -74,16 +74,12 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
         print("\nLoading stem model...")
         stemmer = Stemmer.Stemmer('english')
         path_suf = "stem_tfidf_svc"
-
     elif args.lem:
         import spacy
         tokenization.init_gpu()
         print("\nLoading lemmatization model...")
         nlp_obj = spacy.load("en_core_web_trf")
         path_suf = "lem_tfidf_svc"
-
-    else:
-        path_suf = "tfidf_svc"
 
     if args.non_linear:
         path_suf += '_nl'
