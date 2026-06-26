@@ -1,17 +1,7 @@
-# Klasyfikacja artykułów z podziałem na kategorie
+# Klasyfikacja artykułów z podziałem na kategorie / System RAG z dokumentów o ML
 
-*Celem tego ćwiczenia jest utrwalenie wiedzy z Pythona/NLP przed rozpoczęciem praktyk w firmie WASKO.*
+*Celem tego ćwiczenia jest rozszerzenie wiedzy praktycznej o NLP/RAG.*
 
----
-
-**TODO**:
-- [x] Krótki opis datasetu
-- [x] Opisać najważniejsze obserwacje
-- [x] Wynik na Kaggle
-- [x] Dodać Stemming i Lematyzacje
-- [ ] Dodać testy tokenization.py
-- [ ] RAG
-- [ ] Dodać sekcję instalacji
 
 ---
 
@@ -157,6 +147,42 @@ Wnioski z całości:
 
 7. **Wysłanie na Kaggle**
    - Przygotowany zbiór testowy z konkursu na platformie Kaggle, składający się z 722 rekordów, został przepuszczony przez wytrenowane modele. Uzyskane predykcje zostały wysłane w formacie .csv jako *Late Submission*. Obowiązującą metryką w wyzwaniu była dokładność (*Accuracy*). Udało się osiągnąć wynik na poziomie **0.98367** dla modelu bez normalizacji tekstu. Użycie stemmingu pogorszyło wynik do **0.94421**, a lematyzacja do **0.97959**. Uzyskany wynik jest wyższy niż najwyższy rezultat znajdujący się obecnie w tabeli wyników (**0.98231**). Oznacza to, że w tym przypadku odpowiednie czyszczenie danych tekstowych było najlepszym rozwiązaniem.
+
+## RAG
+
+W części RAG udało się zbudować prosty mechanizm wyszukiwania i odpowiedzi na pytania w oparciu o embeddingi:
+
+- dokumenty z katalogu `docs/` oraz artykuły BBC są dzielone na nakładające się chunki,
+- chunki są zamieniane na wektory przy użyciu modeli `sentence-transformers`,
+- podobieństwo między zapytaniem a fragmentami tekstu jest liczone przez iloczyn skalarny na znormalizowanych embeddingach,
+- funkcja `retrieve()` zwraca najbardziej pasujące fragmenty, a `answer()` przekazuje je do modelu `llama3.2` przez `ollama`,
+- całość pozwala odpowiadać wyłącznie na podstawie znalezionego kontekstu, bez zgadywania spoza danych.
+
+Przykładowe pytania i uzyskane odpowiedzi z folderu `docs/`:
+```
+>> uv run main.py --rag
+```
+```
+Pytanie: Czym jest nadmierne dopasowanie?
+Odpowiedź: Odpowiedź: Przeuczenie (overfitting) występuje, gdy model zbyt dokładnie dopasowuje się do danych treningowych, w tym do szumu, i słabo działa na nowych danych.
+--------------------
+Pytanie: Co to overfitting?
+Odpowiedź: Overfitting występuje, gdy model zbyt dokładnie dopasowuje się do danych treningowych, w tym do szumu, i słabo działa na nowych danych. Typowym objawem jest duża różnica między wysokim wynikiem na zbiorze treningowym a niższym na testowym.
+--------------------
+Pytanie: Kiedy się ustawia i co kontrolują hiperparametry?
+Odpowiedź: Hiperparametry ustawia się zwykle przed treningiem modelu i kontrolują proces uczenia. Kontrolują różne parametry, takie jak:
+
+- learning rate (stopień uczenia)
+- siła regularyzacji (C w SVM)
+- `max_depth` w drzewie decyzyjnym
+- wagi w modelu liniowym
+- wektory nośne w SVM
+
+Te hiperparametry zwykle stroi się walidacją, taką jak `GridSearchCV`, aby znaleźć najbardziej optymalne wartości.
+--------------------
+Pytanie: Czy mogę użyć danych testowych do trenowania modelu?
+Odpowiedź: Nie, nie można użyć danych testowych do trenowania modelu. Użycie tych samych danych do obu etapów procesu uczenia może powodować wyciek danych (data leakage), który może skutecznie spowodować fałszywe wyniki ewaluacji modelu.
+```
 
 ## Źródło
 
