@@ -45,8 +45,8 @@ Struktura projektu przedstawia się następująco:
 │       ├── features.py     # TfidfVectorizer, przygotowanie X, y
 │       ├── tokenization.py # stemming, Lametyzacja
 │       ├── train.py        # trening + zapis modelu
-│       ├── train.py        # trening + zapis modelu
-│       ├── train.py        # trening + zapis modelu
+│       ├── rag.py          # cały proces RAG
+│       ├── parrallel.py    # testowanie multiprocessingu
 │       └── predict.py      # predykcja na nowym tekście
 │
 ├── notebooks/
