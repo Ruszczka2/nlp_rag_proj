@@ -126,7 +126,7 @@ def tfidf_svc_pipeline(args: Any | None = None, model_path: Path = Path.cwd() / 
 
         submission_df.to_csv(Path.cwd() / "outputs" / f"{path_suf}.csv", index=False)
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--submit", action="store_true", help="Wygeneruj plik submission_kaggle.csv")
     parser.add_argument("-ft", "--force-train", action="store_true", help="Wymuś trenowanie modelu mimo już istniejącego")
@@ -154,3 +154,6 @@ if __name__ == "__main__":
     else:
         tfidf_svc_pipeline(args)
 
+
+if __name__ == "__main__":
+    main()
